@@ -1,0 +1,72 @@
+from enum import Enum, IntEnum
+
+
+class MT5Timeframe(str, Enum):
+    """Standard MT5 Timeframes mapped to their string representation."""
+    TIMEFRAME_M1 = "TIMEFRAME_M1"
+    TIMEFRAME_M2 = "TIMEFRAME_M2"
+    TIMEFRAME_M3 = "TIMEFRAME_M3"
+    TIMEFRAME_M4 = "TIMEFRAME_M4"
+    TIMEFRAME_M5 = "TIMEFRAME_M5"
+    TIMEFRAME_M6 = "TIMEFRAME_M6"
+    TIMEFRAME_M10 = "TIMEFRAME_M10"
+    TIMEFRAME_M12 = "TIMEFRAME_M12"
+    TIMEFRAME_M15 = "TIMEFRAME_M15"
+    TIMEFRAME_M20 = "TIMEFRAME_M20"
+    TIMEFRAME_M30 = "TIMEFRAME_M30"
+    TIMEFRAME_H1 = "TIMEFRAME_H1"
+    TIMEFRAME_H2 = "TIMEFRAME_H2"
+    TIMEFRAME_H3 = "TIMEFRAME_H3"
+    TIMEFRAME_H4 = "TIMEFRAME_H4"
+    TIMEFRAME_H6 = "TIMEFRAME_H6"
+    TIMEFRAME_H8 = "TIMEFRAME_H8"
+    TIMEFRAME_H12 = "TIMEFRAME_H12"
+    TIMEFRAME_D1 = "TIMEFRAME_D1"
+    TIMEFRAME_W1 = "TIMEFRAME_W1"
+    TIMEFRAME_MN1 = "TIMEFRAME_MN1"
+
+
+class MT5OrderType(IntEnum):
+    """MT5 Order Types."""
+    ORDER_TYPE_BUY = 0
+    ORDER_TYPE_SELL = 1
+    ORDER_TYPE_BUY_LIMIT = 2
+    ORDER_TYPE_SELL_LIMIT = 3
+    ORDER_TYPE_BUY_STOP = 4
+    ORDER_TYPE_SELL_STOP = 5
+    ORDER_TYPE_BUY_STOP_LIMIT = 6
+    ORDER_TYPE_SELL_STOP_LIMIT = 7
+    ORDER_TYPE_CLOSE_BY = 8
+
+
+class MT5TradeAction(IntEnum):
+    """MT5 Trade Actions for order_send and order_check."""
+    TRADE_ACTION_DEAL = 1
+    TRADE_ACTION_PENDING = 5
+    TRADE_ACTION_SLTP = 6
+    TRADE_ACTION_MODIFY = 7
+    TRADE_ACTION_REMOVE = 8
+    TRADE_ACTION_CLOSE_BY = 10
+
+
+class MT5OrderTime(IntEnum):
+    """MT5 Order Expiration types."""
+    ORDER_TIME_GTC = 0
+    ORDER_TIME_DAY = 1
+    ORDER_TIME_SPECIFIED = 2
+    ORDER_TIME_SPECIFIED_DAY = 3
+
+
+class MT5OrderFilling(IntEnum):
+    """MT5 Order Filling Execution policies."""
+    ORDER_FILLING_FOK = 0
+    ORDER_FILLING_IOC = 1
+    ORDER_FILLING_RETURN = 2
+    ORDER_FILLING_BOC = 3
+
+
+class MT5CopyTicks(IntEnum):
+    """Flags for copy_ticks."""
+    COPY_TICKS_ALL = -1
+    COPY_TICKS_INFO = 1
+    COPY_TICKS_TRADE = 2
