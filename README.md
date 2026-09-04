@@ -48,26 +48,24 @@ Client (HTTP/REST)
 ```
 mt5-web-service/
 ├── .github/
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── .env.example
-├── .gitignore
-├── requirements.txt
-├── LICENSE
-├── README.md
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md       # Template estruturado para reporte de bugs
+│   │   └── feature_request.md  # Template estruturado para sugestão de novas features
+│   ├── workflows/
+│   │   └── codeql.yml          # Pipeline de CI (Testes Pytest + CodeQL Code Scanning)
+│   └── dependabot.yml          # Configuração de atualizações automáticas de dependências
 ├── app/
-│   ├── __init__.py
+│   ├── init.py
 │   ├── config.py                # Pydantic Settings & environment variables
 │   ├── main.py                  # FastAPI initialization & lifespan lifecycle
 │   ├── core/
-│   │   ├── __init__.py
+│   │   ├── init.py
 │   │   ├── constants.py         # MT5 Enums & Timeframe mappings
 │   │   ├── exceptions.py        # Custom exceptions and exception handlers
 │   │   ├── logging.py           # Structured logging setup
 │   │   └── mt5_manager.py       # Connection lifecycle, heartbeat & auto-reconnect
 │   ├── schemas/
-│   │   ├── __init__.py
+│   │   ├── init.py
 │   │   ├── common.py            # API response envelopes
 │   │   ├── account.py           # Account schemas
 │   │   ├── terminal.py          # Terminal info & version schemas
@@ -79,13 +77,13 @@ mt5-web-service/
 │   │   ├── positions.py         # Position schemas & close requests
 │   │   └── history.py           # History query & deal schemas
 │   ├── services/
-│   │   ├── __init__.py
+│   │   ├── init.py
 │   │   └── mt5_service.py       # Safe MT5 API execution & type serialization
 │   └── api/
-│       ├── __init__.py
+│       ├── init.py
 │       ├── dependencies.py      # require_mt5_connection dependency (HTTP 503)
 │       └── v1/
-│           ├── __init__.py
+│           ├── init.py
 │           ├── router.py        # Centralized v1 router
 │           ├── health.py        # Health & status endpoint
 │           ├── terminal.py      # Terminal info endpoints
@@ -97,10 +95,16 @@ mt5-web-service/
 │           ├── orders.py        # Active orders & trade dispatch
 │           ├── positions.py     # Open positions & close handler
 │           └── history.py       # Historical deals & orders
-└── tests/
-    ├── __init__.py
-    ├── conftest.py              # Mock fixtures & AsyncClient test client
-    └── test_health_and_reconnection.py
+├── tests/
+│   ├── init.py
+│   ├── conftest.py              # Mock fixtures & AsyncClient test client
+│   └── test_health_and_reconnection.py
+├── .env.example
+├── .gitignore
+├── LICENSE
+├── pytest.ini
+├── requirements.txt
+└── README.md
 ```
 
 ---
