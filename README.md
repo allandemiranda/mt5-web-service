@@ -1,5 +1,7 @@
 # MetaTrader 5 (MT5) Web Service
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A production-grade, asynchronous Web Backend API written in Python using FastAPI, providing a complete REST API wrapper around the official **[MetaTrader 5 (MQL5) Python Integration](https://www.mql5.com/en/docs/python_metatrader5)**.
 
 ---
@@ -43,9 +45,14 @@ Client (HTTP/REST)
 
 ```
 mt5-web-service/
+├── .github/
+│   └── ISSUE_TEMPLATE/
+│       ├── bug_report.md
+│       └── feature_request.md
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt
+├── LICENSE
 ├── README.md
 ├── app/
 │   ├── __init__.py
@@ -196,3 +203,17 @@ Interactive API documentation is available at `http://localhost:8000/docs`.
 ```bash
 pytest tests/ -v
 ```
+---
+
+## Contributing & Issues
+
+Contributions are always welcome! If you find a bug or have a suggestion for a new feature, please make use of our issue templates when opening an issue on GitHub:
+
+* **Bug Report**: Use `.github/ISSUE_TEMPLATE/bug_report.md` for reporting unexpected behavior or errors.
+* **Feature Request**: Use `.github/ISSUE_TEMPLATE/feature_request.md` for proposing new features or enhancements.
+
+---
+
+## License
+
+This project is licensed under the terms of the [MIT License](LICENSE).
