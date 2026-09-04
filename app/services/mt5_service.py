@@ -43,10 +43,26 @@ TIMEFRAME_MAP = {
 class MT5Service:
     """Thread-safe service wrapping all MetaTrader 5 C-extension API calls."""
 
+    def _require_mt5(self) -> None:
+        """Raise MT5ServiceException if the MetaTrader5 package is unavailable.
+
+        This occurs on non-Windows platforms (e.g. inside a Linux Docker container)
+        where the C-extension cannot be installed. Endpoints remain reachable and
+        return a structured error instead of crashing with an AttributeError.
+        """
+        if mt5 is None:
+            raise MT5ServiceException(
+                "MetaTrader5 Python package is not available on this platform. "
+                "The web server is running but cannot reach the MT5 terminal.",
+                error_code=-1,
+            )
+
     # -------------------------------------------------------------
     # Terminal & Version
     # -------------------------------------------------------------
     async def get_version(self) -> dict:
+        self._require_mt5()
+
         def _get():
             res = mt5.version()
             if res is None:
@@ -57,6 +73,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def get_terminal_info(self) -> dict:
+        self._require_mt5()
+
         def _get():
             info = mt5.terminal_info()
             if info is None:
@@ -67,6 +85,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def get_last_error(self) -> dict:
+        self._require_mt5()
+
         def _get():
             err = mt5.last_error()
             return {"code": err[0], "description": err[1]}
@@ -77,6 +97,8 @@ class MT5Service:
     # Account
     # -------------------------------------------------------------
     async def get_account_info(self) -> dict:
+        self._require_mt5()
+
         def _get():
             acc = mt5.account_info()
             if acc is None:
@@ -90,9 +112,12 @@ class MT5Service:
     # Symbols & Market Data
     # -------------------------------------------------------------
     async def get_symbols_total(self) -> int:
+        self._require_mt5()
         return await asyncio.to_thread(mt5.symbols_total)
 
     async def get_symbols(self, group: Optional[str] = None) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             symbols = mt5.symbols_get(group) if group else mt5.symbols_get()
             if symbols is None:
@@ -103,6 +128,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def get_symbol_info(self, symbol: str) -> dict:
+        self._require_mt5()
+
         def _get():
             info = mt5.symbol_info(symbol)
             if info is None:
@@ -113,6 +140,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def get_symbol_tick(self, symbol: str) -> dict:
+        self._require_mt5()
+
         def _get():
             tick = mt5.symbol_info_tick(symbol)
             if tick is None:
@@ -123,6 +152,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def select_symbol(self, symbol: str, enable: bool = True) -> bool:
+        self._require_mt5()
+
         def _select():
             res = mt5.symbol_select(symbol, enable)
             if not res:
@@ -136,6 +167,8 @@ class MT5Service:
     # Market Depth (DOM)
     # -------------------------------------------------------------
     async def market_book_add(self, symbol: str) -> bool:
+        self._require_mt5()
+
         def _add():
             res = mt5.market_book_add(symbol)
             if not res:
@@ -146,6 +179,8 @@ class MT5Service:
         return await asyncio.to_thread(_add)
 
     async def market_book_get(self, symbol: str) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             book = mt5.market_book_get(symbol)
             if book is None:
@@ -156,6 +191,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def market_book_release(self, symbol: str) -> bool:
+        self._require_mt5()
+
         def _release():
             res = mt5.market_book_release(symbol)
             if not res:
@@ -169,6 +206,7 @@ class MT5Service:
     # Rates (OHLCV)
     # -------------------------------------------------------------
     async def copy_rates_from(self, symbol: str, timeframe: MT5Timeframe, date_from: datetime, count: int) -> List[dict]:
+        self._require_mt5()
         tf = TIMEFRAME_MAP.get(timeframe, 1)
 
         def _copy():
@@ -194,6 +232,7 @@ class MT5Service:
         return await asyncio.to_thread(_copy)
 
     async def copy_rates_from_pos(self, symbol: str, timeframe: MT5Timeframe, start_pos: int, count: int) -> List[dict]:
+        self._require_mt5()
         tf = TIMEFRAME_MAP.get(timeframe, 1)
 
         def _copy():
@@ -219,6 +258,7 @@ class MT5Service:
         return await asyncio.to_thread(_copy)
 
     async def copy_rates_range(self, symbol: str, timeframe: MT5Timeframe, date_from: datetime, date_to: datetime) -> List[dict]:
+        self._require_mt5()
         tf = TIMEFRAME_MAP.get(timeframe, 1)
 
         def _copy():
@@ -247,6 +287,8 @@ class MT5Service:
     # Ticks Data
     # -------------------------------------------------------------
     async def copy_ticks_from(self, symbol: str, date_from: datetime, count: int, flags: MT5CopyTicks) -> List[dict]:
+        self._require_mt5()
+
         def _copy():
             ticks = mt5.copy_ticks_from(symbol, date_from, count, flags.value)
             if ticks is None or len(ticks) == 0:
@@ -269,6 +311,8 @@ class MT5Service:
         return await asyncio.to_thread(_copy)
 
     async def copy_ticks_range(self, symbol: str, date_from: datetime, date_to: datetime, flags: MT5CopyTicks) -> List[dict]:
+        self._require_mt5()
+
         def _copy():
             ticks = mt5.copy_ticks_range(symbol, date_from, date_to, flags.value)
             if ticks is None or len(ticks) == 0:
@@ -294,9 +338,12 @@ class MT5Service:
     # Orders & Trading
     # -------------------------------------------------------------
     async def get_orders_total(self) -> int:
+        self._require_mt5()
         return await asyncio.to_thread(mt5.orders_total)
 
     async def get_orders(self, symbol: Optional[str] = None, group: Optional[str] = None, ticket: Optional[int] = None) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             if ticket is not None:
                 orders = mt5.orders_get(ticket=ticket)
@@ -315,6 +362,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def order_check(self, req: TradeRequest) -> dict:
+        self._require_mt5()
+
         def _check():
             payload = {k: v for k, v in req.model_dump().items() if v is not None}
             res = mt5.order_check(payload)
@@ -326,6 +375,8 @@ class MT5Service:
         return await asyncio.to_thread(_check)
 
     async def order_send(self, req: TradeRequest) -> dict:
+        self._require_mt5()
+
         def _send():
             payload = {k: v for k, v in req.model_dump().items() if v is not None}
             # Auto-populate price if DEAL market order and price is omitted
@@ -343,6 +394,8 @@ class MT5Service:
         return await asyncio.to_thread(_send)
 
     async def order_calc_margin(self, action: int, symbol: str, volume: float, price: float) -> Optional[float]:
+        self._require_mt5()
+
         def _calc():
             margin = mt5.order_calc_margin(action, symbol, volume, price)
             if margin is None:
@@ -353,6 +406,8 @@ class MT5Service:
         return await asyncio.to_thread(_calc)
 
     async def order_calc_profit(self, action: int, symbol: str, volume: float, price_open: float, price_close: float) -> Optional[float]:
+        self._require_mt5()
+
         def _calc():
             profit = mt5.order_calc_profit(action, symbol, volume, price_open, price_close)
             if profit is None:
@@ -366,9 +421,12 @@ class MT5Service:
     # Positions
     # -------------------------------------------------------------
     async def get_positions_total(self) -> int:
+        self._require_mt5()
         return await asyncio.to_thread(mt5.positions_total)
 
     async def get_positions(self, symbol: Optional[str] = None, group: Optional[str] = None, ticket: Optional[int] = None) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             if ticket is not None:
                 positions = mt5.positions_get(ticket=ticket)
@@ -388,6 +446,8 @@ class MT5Service:
 
     async def close_position(self, ticket: int, deviation: int = 10, comment: str = "Close via API") -> dict:
         """Closes an open position by ticket with opposite market order."""
+        self._require_mt5()
+
         def _close():
             positions = mt5.positions_get(ticket=ticket)
             if not positions or len(positions) == 0:
@@ -429,6 +489,8 @@ class MT5Service:
     # History (Deals & Orders)
     # -------------------------------------------------------------
     async def get_history_orders_total(self, date_from: datetime, date_to: datetime) -> int:
+        self._require_mt5()
+
         def _get():
             return mt5.history_orders_total(date_from, date_to)
 
@@ -442,6 +504,8 @@ class MT5Service:
         ticket: Optional[int] = None,
         position: Optional[int] = None,
     ) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             if ticket is not None:
                 orders = mt5.history_orders_get(ticket=ticket)
@@ -460,6 +524,8 @@ class MT5Service:
         return await asyncio.to_thread(_get)
 
     async def get_history_deals_total(self, date_from: datetime, date_to: datetime) -> int:
+        self._require_mt5()
+
         def _get():
             return mt5.history_deals_total(date_from, date_to)
 
@@ -473,6 +539,8 @@ class MT5Service:
         ticket: Optional[int] = None,
         position: Optional[int] = None,
     ) -> List[dict]:
+        self._require_mt5()
+
         def _get():
             if ticket is not None:
                 deals = mt5.history_deals_get(ticket=ticket)

@@ -1,0 +1,41 @@
+version: "3.9"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# MT5 Web Service – Docker Compose
+#
+# NOTE: The MetaTrader 5 terminal (terminal64.exe) is a native Windows process
+#       and CANNOT run inside a Linux container. This compose file starts only
+#       the Python/FastAPI web server. MT5 must already be running on the host
+#       (or on a reachable Windows machine) with the IPC pipe accessible.
+#
+# Usage:
+#   docker compose up --build          # build image and start
+#   docker compose up -d               # start in detached mode
+#   docker compose down                # stop and remove containers
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+  mt5-web-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: mt5-web-service
+    restart: unless-stopped
+
+    # Load environment variables from .env file
+    env_file:
+      - .env
+
+    ports:
+      # HOST_PORT:CONTAINER_PORT  — change HOST_PORT if 8000 is already in use
+      - "${PORT:-8000}:8000"
+
+    # Healthcheck uses the /api/v1/health endpoint
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

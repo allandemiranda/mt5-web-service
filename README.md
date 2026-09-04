@@ -2,6 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-005571?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A production-grade, asynchronous Web Backend API written in Python using FastAPI, providing a complete REST API wrapper around the official **[MetaTrader 5 (MQL5) Python Integration](https://www.mql5.com/en/docs/python_metatrader5)**.
@@ -99,8 +100,11 @@ mt5-web-service/
 │   ├── init.py
 │   ├── conftest.py              # Mock fixtures & AsyncClient test client
 │   └── test_health_and_reconnection.py
+├── .dockerignore                # Files excluded from Docker build context
 ├── .env.example
 ├── .gitignore
+├── docker-compose.yml           # Docker Compose service definition
+├── Dockerfile                   # Multi-stage Docker image build
 ├── LICENSE
 ├── pytest.ini
 ├── requirements.txt
@@ -163,6 +167,74 @@ python -m app.main
 
 The server starts at `http://localhost:8000`.
 Interactive API documentation is available at `http://localhost:8000/docs`.
+
+---
+
+## Running with Docker
+
+> **Important:** The MetaTrader 5 terminal (`terminal64.exe`) is a native Windows
+> process and **cannot run inside a Linux container**. The Docker setup runs only
+> the Python/FastAPI web server. The MT5 terminal must be running on the host
+> machine (or a reachable Windows machine) before starting the container.
+
+### Requirements
+- Docker 20.10+ with Docker Compose v2
+- MetaTrader 5 Terminal running on the Windows host
+
+### Quick Start
+
+```bash
+# 1. Create your .env file from the example
+copy .env.example .env
+# (edit .env with your MT5 credentials)
+
+# 2. Build the image and start the container
+docker compose up --build
+
+# 3. (Optional) Run in detached mode
+docker compose up -d
+
+# 4. Stop the container
+docker compose down
+```
+
+The server will be available at `http://localhost:8000` (or the port set in `PORT`).
+
+### Image Details
+
+The `Dockerfile` uses a **multi-stage build**:
+
+| Stage | Base | Purpose |
+|---|---|---|
+| `builder` | `python:3.12-slim` | Installs Python dependencies into an isolated `/opt/venv` |
+| `runtime` | `python:3.12-slim` | Copies only the venv + app source; runs as a non-root user |
+
+The `MetaTrader5` package is a Windows-only C-extension and is automatically
+skipped during the Linux Docker build (via the `platform_system == "Windows"`
+marker in `requirements.txt`). When the container starts without a reachable MT5
+terminal, all protected endpoints return **HTTP 503** and the auto-reconnection
+loop retries in the background — the same behavior as a native run.
+
+### Environment Variables in Docker
+
+All variables from `.env` are passed to the container via the `env_file` directive
+in `docker-compose.yml`. Sensitive values (password, login) are **never baked into
+the image**.
+
+```bash
+# Override a single variable without editing .env
+PORT=9000 docker compose up
+```
+
+### Building the Image Manually
+
+```bash
+# Build only the runtime stage
+docker build --target runtime -t mt5-web-service:latest .
+
+# Run standalone (supply env vars explicitly)
+docker run --rm -p 8000:8000 --env-file .env mt5-web-service:latest
+```
 
 ---
 

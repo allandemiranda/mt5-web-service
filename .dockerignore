@@ -1,0 +1,35 @@
+# Git
+.git/
+.github/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+
+# Secrets (never copy into the image)
+.env
+
+# Tests (not needed at runtime)
+tests/
+
+# Documentation
+README.md
+LICENSE
