@@ -1,5 +1,7 @@
 # MetaTrader 5 (MT5) Web Service
 
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-005571?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A production-grade, asynchronous Web Backend API written in Python using FastAPI, providing a complete REST API wrapper around the official **[MetaTrader 5 (MQL5) Python Integration](https://www.mql5.com/en/docs/python_metatrader5)**.
